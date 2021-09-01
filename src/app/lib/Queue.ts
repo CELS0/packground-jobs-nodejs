@@ -22,5 +22,15 @@ export default {
     const queue = this.queues.find(queue => queue.name === name)
 
     return queue.bull.add(data)
+  },
+  process() {
+    return this.queues.forEach(queue => {
+      queue.bull.process(queue.handle)
+
+      queue.bull.on('failed', (job: any, err: any) => {
+        console.log('Job failed', queue.key, job.data)
+        console.log('Erro: ', err)
+      })
+    })
   }
 }
